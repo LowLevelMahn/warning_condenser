@@ -3,6 +3,9 @@
 simple C++ tool for condesing/sorting duplicated warnings in build outputs of gcc,clang
 it help to better see relevant warnings or start reducing them beginning with the most occureing
 
+wrote that tool before knowing: `-fdiagnostics-format=json`
+https://stackoverflow.com/questions/36657869/how-do-i-dump-gcc-warnings-into-a-structured-format
+
 just grab all the build warnings with 
 
 [build command] > out.txt 2>&1
