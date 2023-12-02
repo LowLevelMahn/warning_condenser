@@ -1,0 +1,201 @@
+/*
+
+[build command] > out.txt 2>&1
+build command can be make, cmake, a direct gcc,g++,clang,clang++ line, etc.
+
+*/
+
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <regex>
+#include <iostream>
+#include <cassert>
+#include <map>
+
+std::vector<std::string> read_text_file_into_vector(const std::string& filepath_)
+{
+#if 1
+    std::vector<std::string> lines;
+    std::ifstream input_file;
+    input_file.open(filepath_);
+    assert(input_file);
+
+    for (std::string line; std::getline(input_file, line); /**/) {
+        lines.push_back(line);
+    }
+    return lines;
+#else
+    std::ifstream input_file;
+    input_file.open(filepath_);
+    std::string line;
+    std::vector<std::string> output_vector;
+    while (getline(input_file, line))
+    {
+        std::istringstream ss_line(line);
+        while (ss_line) {
+            std::string element;
+            ss_line >> element;
+            output_vector.push_back(element);
+        }
+    }
+    return output_vector;
+#endif
+}
+
+int main()
+{
+    // /home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning:
+
+#if 0
+    std::vector<std::string> warnings = read_text_file_into_vector(R"(D:\temp\__warning_condenser\gcc.build.txt)");
+#endif
+
+#if 1
+    std::vector<std::string> warnings = read_text_file_into_vector(R"(D:\temp\__warning_condenser\clang.build.txt)");
+#endif
+
+#if 0
+    std::vector<std::string> warnings
+    {
+R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning: unused parameter 'errno_copy' [-Wunused-parameter])",
+R"(   65 |   TTransportException(TTransportExceptionType type, const std::string& message, int errno_copy))",
+R"(      |                                                                                     ^)",
+R"(1 warning generated.)",
+R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniz/miniz.cpp:3161:76: warning: unused parameter 'pArray' [-Wunused-parameter])",
+R"( 3161 | static MZ_FORCEINLINE mz_uint mz_zip_array_range_check(const mz_zip_array *pArray, mz_uint index))",
+R"(      |                                                                            ^)",
+R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniz/miniz.cpp:5998:120: warning: unused parameter 'last_modified' [-Wunused-parameter])",
+R"( 5998 |                                     mz_uint level_and_flags, mz_uint64 uncomp_size, mz_uint32 uncomp_crc32, MZ_TIME_T *last_modified,)",
+R"(      |                                                                                                                        ^)",
+R"(2 warnings generated.)",
+R"([  0%] Building CXX object third_party/utf8proc/CMakeFiles/utf8proc.dir/utf8proc_wrapper.cpp.o)",
+R"([  1%] Building CXX object third_party/miniparquet/CMakeFiles/miniparquet.dir/src/parquet/parquet_types.cpp.o)",
+R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstate.cpp:29:)",
+R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/prog.h:23:)",
+R"(/home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/sparse_array.h:231:36: warning: unused parameter 'min' [-Wunused-parameter])",
+R"(  231 |     void MaybeInitializeMemory(int min, int max) {)",
+R"(      |                                    ^)",
+R"(/home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/sparse_array.h:231:45: warning: unused parameter 'max' [-Wunused-parameter])",
+R"(  231 |     void MaybeInitializeMemory(int min, int max) {)",
+R"(      |                                             ^)",
+R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstate.cpp:29:)"
+    };
+#endif
+
+    struct warning_info_t
+    {
+        size_t log_line{};
+        std::string full;
+        std::string path;
+        size_t line{};
+        size_t row{};
+        std::string msg;
+        std::string type;
+
+        std::vector<std::string> diag_line;
+        std::string full_diag;
+    };
+
+    std::vector<warning_info_t> warnings_info;
+
+    // find warnings
+
+    const std::regex warning_regex(R"(^(/.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[(.*?)\]$)");
+    for (size_t i = 0; i < warnings.size(); ++i)
+    {
+        const auto& line = warnings[i];
+        //printf("%s\n", line.c_str());
+        std::smatch match;
+        if (std::regex_match(line, match, warning_regex))
+        {
+            assert(match.size() == 6);
+            const std::string full = match[0];
+            const std::string path = match[1];
+            const size_t line = std::stoi(match[2]);
+            const size_t row = std::stoi(match[3]);
+            const std::string msg = match[4];
+            const std::string type = match[5];
+            //printf("%s\n", line.c_str());
+
+            warnings_info.push_back({ i, full, path, line, row, msg, type });
+        }
+    }
+
+    // get diagnostic lines
+
+    for (auto& wi : warnings_info)
+    {
+        //printf("line: %zu\n  file: %s\n  at: %zu/%zu\n  msg: %s\n  type: %s\n", wi.log_line, wi.path.c_str(), wi.line, wi.row, wi.msg.c_str(), wi.type.c_str());
+
+        /*
+/home/linux/tests/kuzu_dev/kuzu/third_party/re2/compile.cpp:787:35: warning: unused parameter 're' [-Wunused-parameter]
+  787 | Frag Compiler::ShortVisit(Regexp* re, Frag) {
+      |                                   ^
+/home/linux/tests/kuzu_dev/kuzu/third_party/re2/compile.cpp:793:33: warning: unused parameter 're' [-Wunused-parameter]
+        */
+
+        const std::regex diag_regex(R"(^\s+(\d+)*\s+\|.*?$)");
+        for (size_t i = wi.log_line + 1; i < warnings.size(); ++i)
+        {
+            const std::string& line = warnings[i];
+            std::smatch match;
+            int brk = 1;
+            if (std::regex_match(line, match, diag_regex))
+            {
+                //printf("%s\n", line.c_str());
+                wi.diag_line.push_back(line);
+                wi.full_diag += line + "\n";
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    std::map<std::string, std::vector<std::string>> type_map;
+
+    for (auto& wi : warnings_info)
+    {
+        const std::string content = wi.path + ":" + std::to_string(wi.line) + ":" + std::to_string(wi.row) + ": " + wi.msg;
+
+        auto it = type_map.find(wi.type);
+        if (it == type_map.end())
+        {
+            type_map.insert({ wi.type, {content} });
+        }
+        else
+        {
+            auto& t = type_map[wi.type];
+            if (std::find(t.begin(), t.end(), content) == t.end())
+            {
+                t.push_back(content);
+            }
+        }
+    }
+
+    //printf("line: %zu\n  file: %s\n  at: %zu/%zu\n  msg: %s\n  type: %s\n  diag:\n%s\n------------------------\n",
+    //    wi->log_line, wi->path.c_str(), wi->line, wi->row, wi->msg.c_str(), wi->type.c_str(), wi->full_diag.c_str());
+
+    for (auto& [k, v] : type_map)
+    {
+        printf("type: %s [%u]\n", k.c_str(), v.size());
+
+        auto sv = v;
+        std::sort(sv.begin(), sv.end());
+
+        for (const auto& full : sv)
+        {
+#if 0
+            printf("  file: %s\n  at: %zu/%zu\n  msg: %s\n  diag:\n%s\n------------------------\n",
+                wi->path.c_str(), wi->line, wi->row, wi->msg.c_str(), wi->full_diag.c_str());
+#else
+            printf("  %s\n", full.c_str());
+#endif
+        }
+}
+
+    return 0;
+    }
