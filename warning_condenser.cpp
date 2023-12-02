@@ -16,7 +16,6 @@ build command can be make, cmake, a direct gcc,g++,clang,clang++ line, etc.
 
 std::vector<std::string> read_text_file_into_vector(const std::string& filepath_)
 {
-#if 1
     std::vector<std::string> lines;
     std::ifstream input_file;
     input_file.open(filepath_);
@@ -26,22 +25,6 @@ std::vector<std::string> read_text_file_into_vector(const std::string& filepath_
         lines.push_back(line);
     }
     return lines;
-#else
-    std::ifstream input_file;
-    input_file.open(filepath_);
-    std::string line;
-    std::vector<std::string> output_vector;
-    while (getline(input_file, line))
-    {
-        std::istringstream ss_line(line);
-        while (ss_line) {
-            std::string element;
-            ss_line >> element;
-            output_vector.push_back(element);
-        }
-    }
-    return output_vector;
-#endif
 }
 
 int main()
@@ -102,7 +85,7 @@ R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstat
 
     // find warnings
 
-    const std::regex warning_regex(R"(^(/.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[(.*?)\]$)");
+    const std::regex warning_regex(R"(^(/.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
     for (size_t i = 0; i < warnings.size(); ++i)
     {
         const auto& line = warnings[i];
@@ -188,14 +171,9 @@ R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstat
 
         for (const auto& full : sv)
         {
-#if 0
-            printf("  file: %s\n  at: %zu/%zu\n  msg: %s\n  diag:\n%s\n------------------------\n",
-                wi->path.c_str(), wi->line, wi->row, wi->msg.c_str(), wi->full_diag.c_str());
-#else
             printf("  %s\n", full.c_str());
-#endif
         }
-}
+    }
 
     return 0;
-    }
+}
