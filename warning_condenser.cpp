@@ -13,6 +13,7 @@ build command can be make, cmake, a direct gcc,g++,clang,clang++ line, etc.
 #include <iostream>
 #include <cassert>
 #include <map>
+#include <filesystem>
 
 std::vector<std::string> read_text_file_into_vector(const std::string& filepath_)
 {
@@ -27,43 +28,53 @@ std::vector<std::string> read_text_file_into_vector(const std::string& filepath_
     return lines;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    // /home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning:
-
-#if 0
-    std::vector<std::string> warnings = read_text_file_into_vector(R"(D:\temp\__warning_condenser\gcc.build.txt)");
-#endif
+    if (argc != 2)
+    {
+        printf("warning_condenser build_output_file\n");
+        printf("create build_output_file:\n");
+        printf("\n");
+        printf("[build command] > out.txt 2 > &1\n");
+        printf("[build command] can be make, cmake, a direct gcc, g++, clang, clang++ line, etc.");
+        return 1;
+    }
 
 #if 1
-    std::vector<std::string> warnings = read_text_file_into_vector(R"(D:\temp\__warning_condenser\clang.build.txt)");
-#endif
+    const std::string filepath = argv[1];
+    if (!std::filesystem::exists(filepath))
+    {
+        printf("file: %s does not exists\n", filepath.c_str());
+        return 2;
+    }
 
-#if 0
+    std::vector<std::string> warnings = read_text_file_into_vector(filepath);
+#else
+    // "unit-test"
     std::vector<std::string> warnings
     {
-R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning: unused parameter 'errno_copy' [-Wunused-parameter])",
-R"(   65 |   TTransportException(TTransportExceptionType type, const std::string& message, int errno_copy))",
-R"(      |                                                                                     ^)",
-R"(1 warning generated.)",
-R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniz/miniz.cpp:3161:76: warning: unused parameter 'pArray' [-Wunused-parameter])",
-R"( 3161 | static MZ_FORCEINLINE mz_uint mz_zip_array_range_check(const mz_zip_array *pArray, mz_uint index))",
-R"(      |                                                                            ^)",
-R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniz/miniz.cpp:5998:120: warning: unused parameter 'last_modified' [-Wunused-parameter])",
-R"( 5998 |                                     mz_uint level_and_flags, mz_uint64 uncomp_size, mz_uint32 uncomp_crc32, MZ_TIME_T *last_modified,)",
-R"(      |                                                                                                                        ^)",
-R"(2 warnings generated.)",
-R"([  0%] Building CXX object third_party/utf8proc/CMakeFiles/utf8proc.dir/utf8proc_wrapper.cpp.o)",
-R"([  1%] Building CXX object third_party/miniparquet/CMakeFiles/miniparquet.dir/src/parquet/parquet_types.cpp.o)",
-R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstate.cpp:29:)",
-R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/prog.h:23:)",
-R"(/home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/sparse_array.h:231:36: warning: unused parameter 'min' [-Wunused-parameter])",
-R"(  231 |     void MaybeInitializeMemory(int min, int max) {)",
-R"(      |                                    ^)",
-R"(/home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/sparse_array.h:231:45: warning: unused parameter 'max' [-Wunused-parameter])",
-R"(  231 |     void MaybeInitializeMemory(int min, int max) {)",
-R"(      |                                             ^)",
-R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstate.cpp:29:)"
+    R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning: unused parameter 'errno_copy' [-Wunused-parameter])",
+    R"(   65 |   TTransportException(TTransportExceptionType type, const std::string& message, int errno_copy))",
+    R"(      |                                                                                     ^)",
+    R"(1 warning generated.)",
+    R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniz/miniz.cpp:3161:76: warning: unused parameter 'pArray' [-Wunused-parameter])",
+    R"( 3161 | static MZ_FORCEINLINE mz_uint mz_zip_array_range_check(const mz_zip_array *pArray, mz_uint index))",
+    R"(      |                                                                            ^)",
+    R"(/home/linux/tests/kuzu_dev/kuzu/third_party/miniz/miniz.cpp:5998:120: warning: unused parameter 'last_modified' [-Wunused-parameter])",
+    R"( 5998 |                                     mz_uint level_and_flags, mz_uint64 uncomp_size, mz_uint32 uncomp_crc32, MZ_TIME_T *last_modified,)",
+    R"(      |                                                                                                                        ^)",
+    R"(2 warnings generated.)",
+    R"([  0%] Building CXX object third_party/utf8proc/CMakeFiles/utf8proc.dir/utf8proc_wrapper.cpp.o)",
+    R"([  1%] Building CXX object third_party/miniparquet/CMakeFiles/miniparquet.dir/src/parquet/parquet_types.cpp.o)",
+    R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstate.cpp:29:)",
+    R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/prog.h:23:)",
+    R"(/home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/sparse_array.h:231:36: warning: unused parameter 'min' [-Wunused-parameter])",
+    R"(  231 |     void MaybeInitializeMemory(int min, int max) {)",
+    R"(      |                                    ^)",
+    R"(/home/linux/tests/kuzu_dev/kuzu/third_party/re2/include/sparse_array.h:231:45: warning: unused parameter 'max' [-Wunused-parameter])",
+    R"(  231 |     void MaybeInitializeMemory(int min, int max) {)",
+    R"(      |                                             ^)",
+    R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstate.cpp:29:)"
     };
 #endif
 
@@ -84,6 +95,8 @@ R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstat
     std::vector<warning_info_t> warnings_info;
 
     // find warnings
+
+    // /home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning:
 
     const std::regex warning_regex(R"(^(/.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
     for (size_t i = 0; i < warnings.size(); ++i)
@@ -113,11 +126,11 @@ R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstat
         //printf("line: %zu\n  file: %s\n  at: %zu/%zu\n  msg: %s\n  type: %s\n", wi.log_line, wi.path.c_str(), wi.line, wi.row, wi.msg.c_str(), wi.type.c_str());
 
         /*
-/home/linux/tests/kuzu_dev/kuzu/third_party/re2/compile.cpp:787:35: warning: unused parameter 're' [-Wunused-parameter]
-  787 | Frag Compiler::ShortVisit(Regexp* re, Frag) {
-      |                                   ^
-/home/linux/tests/kuzu_dev/kuzu/third_party/re2/compile.cpp:793:33: warning: unused parameter 're' [-Wunused-parameter]
-        */
+    /home/linux/tests/kuzu_dev/kuzu/third_party/re2/compile.cpp:787:35: warning: unused parameter 're' [-Wunused-parameter]
+      787 | Frag Compiler::ShortVisit(Regexp* re, Frag) {
+          |                                   ^
+    /home/linux/tests/kuzu_dev/kuzu/third_party/re2/compile.cpp:793:33: warning: unused parameter 're' [-Wunused-parameter]
+            */
 
         const std::regex diag_regex(R"(^\s+(\d+)*\s+\|.*?$)");
         for (size_t i = wi.log_line + 1; i < warnings.size(); ++i)
