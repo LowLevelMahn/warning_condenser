@@ -138,40 +138,73 @@ R"(In file included from /home/linux/tests/kuzu_dev/kuzu/third_party/re2/bitstat
         }
     }
 
-    std::map<std::string, std::vector<std::string>> type_map;
+    std::map<std::string, std::map<std::string, size_t>> type_map;
 
     for (auto& wi : warnings_info)
     {
         const std::string content = wi.path + ":" + std::to_string(wi.line) + ":" + std::to_string(wi.row) + ": " + wi.msg;
 
-        auto it = type_map.find(wi.type);
-        if (it == type_map.end())
+        auto& m = type_map[wi.type];
+
+        auto it = m.find(content);
+        if (it == m.end())
         {
-            type_map.insert({ wi.type, {content} });
+            m[content] = 1;
         }
         else
         {
-            auto& t = type_map[wi.type];
-            if (std::find(t.begin(), t.end(), content) == t.end())
-            {
-                t.push_back(content);
-            }
+            ++m[content];
         }
     }
 
-    //printf("line: %zu\n  file: %s\n  at: %zu/%zu\n  msg: %s\n  type: %s\n  diag:\n%s\n------------------------\n",
-    //    wi->log_line, wi->path.c_str(), wi->line, wi->row, wi->msg.c_str(), wi->type.c_str(), wi->full_diag.c_str());
+    //-----
 
+    struct warning_count_t
+    {
+        size_t count{};
+        std::string content;
+    };
+
+    struct type_info_t
+    {
+        std::string type;
+        std::vector<warning_count_t> warnings;
+    };
+
+    std::vector<type_info_t> type_infos;
     for (auto& [k, v] : type_map)
     {
-        printf("type: %s [%u]\n", k.c_str(), v.size());
+        type_info_t ti;
+        ti.type = k;
 
-        auto sv = v;
-        std::sort(sv.begin(), sv.end());
-
-        for (const auto& full : sv)
+        for (const auto& [k2, v2] : v)
         {
-            printf("  %s\n", full.c_str());
+            ti.warnings.push_back({ v2, k2 });
+        }
+
+        type_infos.push_back(ti);
+    }
+
+    auto pred = [&](type_info_t& a, type_info_t& b) { return a.warnings.size() > b.warnings.size(); };
+    std::sort(type_infos.begin(), type_infos.end(), pred);
+
+    for (auto& ti : type_infos)
+    {
+        auto& warnings = ti.warnings;
+        auto pred = [&](warning_count_t& a, warning_count_t& b) { return a.count > b.count; };
+        std::sort(warnings.begin(), warnings.end(), pred);
+    }
+
+    //-----
+
+
+    for (const auto& ti : type_infos)
+    {
+        printf("(count: % 5zu) type: %s\n", ti.warnings.size(), ti.type.c_str());
+
+        for (const auto& wc : ti.warnings)
+        {
+            printf("  (% 5zu) %s\n", wc.count, wc.content.c_str());
         }
     }
 
