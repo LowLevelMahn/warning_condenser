@@ -44,3 +44,6 @@ example output:
   (    1) /home/linux/tests/kuzu_dev/kuzu/src/processor/operator/aggregate/simple_aggregate_scan.cpp:10:16: unused variable 'dataPos'
 ```
 
+TODOs:
+- include/exclude filter for pathes
+- importer for -fdiagnostics-format=json
