@@ -48,3 +48,5 @@ TODOs:
 - include/exclude filter for pathes
 - importer for -fdiagnostics-format=json (https://clang.llvm.org/docs/UsersManual.html#formatting-of-diagnostics, https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html#Options-to-Control-Diagnostic-Messages-Formatting)
 - parse MSVC ouput
+- parse clang-tidy output
+- parse MSYS2 MinGW x64/Clang output
