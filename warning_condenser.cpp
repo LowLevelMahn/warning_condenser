@@ -181,6 +181,7 @@ int main(int argc, char* argv[])
     struct type_info_t
     {
         std::string type;
+        size_t warning_count{};
         std::vector<warning_count_t> warnings;
     };
 
@@ -193,12 +194,13 @@ int main(int argc, char* argv[])
         for (const auto& [k2, v2] : v)
         {
             ti.warnings.push_back({ v2, k2 });
+            ti.warning_count += v2;
         }
 
         type_infos.push_back(ti);
     }
 
-    auto pred = [&](type_info_t& a, type_info_t& b) { return a.warnings.size() > b.warnings.size(); };
+    auto pred = [&](type_info_t& a, type_info_t& b) { return a.warning_count > b.warning_count; };
     std::sort(type_infos.begin(), type_infos.end(), pred);
 
     for (auto& ti : type_infos)
@@ -213,7 +215,7 @@ int main(int argc, char* argv[])
 
     for (const auto& ti : type_infos)
     {
-        printf("(count: % 5zu) type: %s\n", ti.warnings.size(), ti.type.c_str());
+        printf("(count: % 5zu) type: %s\n", ti.warning_count, ti.type.c_str());
 
         for (const auto& wc : ti.warnings)
         {
