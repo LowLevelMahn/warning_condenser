@@ -111,9 +111,18 @@ int main(int argc, char* argv[])
 
     // find warnings
 
+    //gcc,clang
     // /home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning:
 
+#define MSVC_WARNINGS()(false)
+
+    //MSVC
+    // warning_producer.cpp(10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+#if MSVC_WARNINGS()
+    const std::regex warning_regex(R"(^(.*?)\((\d+)\)\: warning (C\d+)\: (.*?)$)");
+#else
     const std::regex warning_regex(R"(^(.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
+#endif
     for (size_t i = 0; i < warnings.size(); ++i)
     {
         const auto& line = warnings[i];
@@ -121,6 +130,16 @@ int main(int argc, char* argv[])
         std::smatch match;
         if (std::regex_match(line, match, warning_regex))
         {
+#if MSVC_WARNINGS()
+            assert(match.size() == 5);
+            const std::string full = match[0];
+            const std::string path = match[1];
+            const size_t line = std::stoi(match[2]);
+            const size_t row = 0;
+            const std::string type = match[3];
+            const std::string msg = match[4];
+            int brk = 1;
+#else
             assert(match.size() == 6);
             const std::string full = match[0];
             const std::string path = match[1];
@@ -129,7 +148,7 @@ int main(int argc, char* argv[])
             const std::string msg = match[4];
             const std::string type = match[5];
             //printf("%s\n", line.c_str());
-
+#endif
             warnings_info.push_back({ i, full, path, line, row, msg, type });
         }
     }
