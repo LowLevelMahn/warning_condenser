@@ -30,10 +30,10 @@ std::vector<std::string> read_text_file_into_vector(const std::string& filepath_
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    if ((argc < 2) || (argc > 3))
     {
-        printf("warning_condenser build_output_file\n");
-        printf("create build_output_file:\n");
+        printf("warning_condenser build_output_file [-d]\n");
+        printf("-d: print diagnosis\n");
         printf("\n");
         printf("[build command] > out.txt 2 > &1\n");
         printf("[build command] can be make, cmake, a direct gcc, g++, clang, clang++ line, etc.");
@@ -42,6 +42,21 @@ int main(int argc, char* argv[])
 
 #if 1
     const std::string filepath = argv[1];
+
+    bool with_diag = false;
+    if (argc == 3)
+    {
+        const std::string param = argv[2];
+        if (param == "-d")
+        {
+            with_diag = true;
+        }
+        else
+        {
+            printf("second parameter is optional or -d\n");
+        }
+    }
+
     if (!std::filesystem::exists(filepath))
     {
         printf("file: %s does not exists\n", filepath.c_str());
@@ -155,7 +170,7 @@ int main(int argc, char* argv[])
 
     for (auto& wi : warnings_info)
     {
-        const std::string content = wi.path + ":" + std::to_string(wi.line) + ":" + std::to_string(wi.row) + ": " + wi.msg;
+        std::string content = wi.path + ":" + std::to_string(wi.line) + ":" + std::to_string(wi.row) + ": " + wi.msg + (with_diag ? "\n" + wi.full_diag : "");
 
         auto& m = type_map[wi.type];
 
