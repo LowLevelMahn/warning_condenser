@@ -3,19 +3,22 @@
 simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang
 it help to better see relevant warnings or start reducing them beginning with the most occuring
 
-wrote that tool before knowing: `-fdiagnostics-format=json`
-https://stackoverflow.com/questions/36657869/how-do-i-dump-gcc-warnings-into-a-structured-format
+warning_condenser file_with_warnings [-d]
+
+-d shows also the diagnosis
+
+wrote that tool before knowing: `-fdiagnostics-format=json` (https://stackoverflow.com/questions/36657869/how-do-i-dump-gcc-warnings-into-a-structured-format)
 
 tested with clang 14 & 17 and gcc 11 & 13
 
 just grab all the build warnings with 
 
-[build command] > out.txt 2>&1
+[build command] > file_with_warnings.txt 2>&1
 build command can be make, cmake, a direct gcc,g++,clang,clang++ line, etc.
 
 and run
 
-warning_condenser out.txt
+warning_condenser file_with_warnings.txt
 
 example output:
 
