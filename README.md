@@ -1,11 +1,11 @@
 # warning_condenser
 
-simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang
+simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang,clang-tidy
 it help to better see relevant warnings or start reducing them beginning with the most occuring
 
 warning_condenser file_with_warnings [-d]
 
--d shows also the diagnosis
+-d shows also the diagnosis (currently only working with clang 17,gcc 13)
 
 wrote that tool before knowing: `-fdiagnostics-format=json` (https://stackoverflow.com/questions/36657869/how-do-i-dump-gcc-warnings-into-a-structured-format)
 
