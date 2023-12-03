@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
     // /home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning:
 
-    const std::regex warning_regex(R"(^((.\:)?/.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
+    const std::regex warning_regex(R"(^(.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
     for (size_t i = 0; i < warnings.size(); ++i)
     {
         const auto& line = warnings[i];
@@ -121,13 +121,13 @@ int main(int argc, char* argv[])
         std::smatch match;
         if (std::regex_match(line, match, warning_regex))
         {
-            assert(match.size() == 7);
+            assert(match.size() == 6);
             const std::string full = match[0];
             const std::string path = match[1];
-            const size_t line = std::stoi(match[3]);
-            const size_t row = std::stoi(match[4]);
-            const std::string msg = match[5];
-            const std::string type = match[6];
+            const size_t line = std::stoi(match[2]);
+            const size_t row = std::stoi(match[3]);
+            const std::string msg = match[4];
+            const std::string type = match[5];
             //printf("%s\n", line.c_str());
 
             warnings_info.push_back({ i, full, path, line, row, msg, type });
