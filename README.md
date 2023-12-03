@@ -9,7 +9,7 @@ warning_condenser file_with_warnings [-d]
 
 wrote that tool before knowing: `-fdiagnostics-format=json` (https://stackoverflow.com/questions/36657869/how-do-i-dump-gcc-warnings-into-a-structured-format)
 
-tested with clang 14 & 17 and gcc 11 & 13
+tested with clang 3.4 & 14 & 17 and gcc 4.8.4 & 11 & 13
 
 just grab all the build warnings with 
 
