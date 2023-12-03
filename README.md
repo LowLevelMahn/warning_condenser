@@ -47,3 +47,4 @@ example output:
 TODOs:
 - include/exclude filter for pathes
 - importer for -fdiagnostics-format=json
+- parse MSVC ouput
