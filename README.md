@@ -1,11 +1,11 @@
 # warning_condenser
 
-simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang
+simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang,clang-tidy
 it help to better see relevant warnings or start reducing them beginning with the most occuring
 
 warning_condenser file_with_warnings [-d]
 
--d shows also the diagnosis
+-d shows also the diagnosis (currently only working with clang 17,gcc 13)
 
 wrote that tool before knowing: `-fdiagnostics-format=json` (https://stackoverflow.com/questions/36657869/how-do-i-dump-gcc-warnings-into-a-structured-format)
 
@@ -44,3 +44,9 @@ example output:
   (    1) /home/linux/tests/kuzu_dev/kuzu/src/processor/operator/aggregate/simple_aggregate_scan.cpp:10:16: unused variable 'dataPos'
 ```
 
+TODOs:
+- include/exclude filter for pathes
+- importer for -fdiagnostics-format=json (https://clang.llvm.org/docs/UsersManual.html#formatting-of-diagnostics, https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html#Options-to-Control-Diagnostic-Messages-Formatting)
+- parse MSVC ouput
+- parse clang-tidy output
+- parse MSYS2 MinGW x64/Clang output
