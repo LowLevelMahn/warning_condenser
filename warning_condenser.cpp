@@ -5,6 +5,9 @@ build command can be make, cmake, a direct gcc,g++,clang,clang++ line, etc.
 
 */
 
+// MSBuild format
+// https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-diagnostic-format-for-tasks?view=vs-2022
+
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -114,32 +117,31 @@ int main(int argc, char* argv[])
     //gcc,clang
     // /home/linux/tests/kuzu_dev/kuzu/third_party/miniparquet/src/thrift/transport/TTransportException.h:65:85: warning:
 
-#define MSVC_WARNINGS()(false)
-
     //MSVC
     // warning_producer.cpp(10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-#if MSVC_WARNINGS()
-    const std::regex warning_regex(R"(^(.*?)\((\d+)\)\: warning (C\d+)\: (.*?)$)");
-#else
-    const std::regex warning_regex(R"(^(.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
-#endif
+
+    // another example:
+/*
+D:\test123\test.cpp(164,30): warning C4267: "Initialisierung": Konvertierung von "size_t" nach "int", Datenverlust m”glich [D:\test123\test.vcxproj]
+D:\test123\test.cpp(183,55): warning C4267: "Argument": Konvertierung von "size_t" nach "_Ty", Datenverlust m”glich [D:\test123\test.vcxproj]
+D:\test123\test.cpp(183,55): warning C4267:         with [D:\test123\test.vcxproj]
+D:\test123\test.cpp(183,55): warning C4267:         [ [D:\test123\test.vcxproj]
+D:\test123\test.cpp(183,55): warning C4267:             _Ty=int [D:\test123\test.vcxproj]
+D:\test123\test.cpp(183,55): warning C4267:         ] [D:\test123\test.vcxproj]
+*/
+
     for (size_t i = 0; i < warnings.size(); ++i)
     {
         const auto& line = warnings[i];
+
+        //const std::string line = R"(C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(833): warning C4530: C++-Handler verwendet, aber Entladesemantik ist nicht aktiviert. Geben Sie /EHsc an.)";
+
         //printf("%s\n", line.c_str());
+
+        const std::regex clang_gcc_warning_regex(R"(^(.*?)\:(\d+)\:(\d+)\: warning\: (.*?)\[([^ ]*?)\]$)");
         std::smatch match;
-        if (std::regex_match(line, match, warning_regex))
+        if (std::regex_match(line, match, clang_gcc_warning_regex))
         {
-#if MSVC_WARNINGS()
-            assert(match.size() == 5);
-            const std::string full = match[0];
-            const std::string path = match[1];
-            const size_t line = std::stoi(match[2]);
-            const size_t row = 0;
-            const std::string type = match[3];
-            const std::string msg = match[4];
-            int brk = 1;
-#else
             assert(match.size() == 6);
             const std::string full = match[0];
             const std::string path = match[1];
@@ -148,8 +150,27 @@ int main(int argc, char* argv[])
             const std::string msg = match[4];
             const std::string type = match[5];
             //printf("%s\n", line.c_str());
-#endif
             warnings_info.push_back({ i, full, path, line, row, msg, type });
+        }
+        else
+        {
+            const std::regex msvc_warning_regex(R"(^(.*?)\((\d+)(,(\d+))?\)\: warning (C\d+)\: (.*?)(\[.*?\])?$)");
+            std::smatch match;
+            if (std::regex_match(line, match, msvc_warning_regex))
+            {
+                assert(match.size() == 8);
+                const std::string full = match[0];
+                const std::string path = match[1];
+                const size_t line = std::stoi(match[2]);
+                const std::string row_str_full = match[3];
+                const std::string row_str = match[4];
+                const size_t row = !row_str.empty() ? std::stoi(row_str) : 0;
+                const std::string type = match[5];
+                const std::string msg = match[6];
+                const std::string prj = match[7];
+                int brk = 1;
+                warnings_info.push_back({ i, full, path, line, row, msg, type });
+            }
         }
     }
 
