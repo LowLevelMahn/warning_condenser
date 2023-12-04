@@ -1,6 +1,6 @@
 # warning_condenser
 
-simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang,clang-tidy
+simple C++ tool for condensing/sorting duplicated warnings in build outputs of gcc,clang,clang-tidy,msvc
 it help to better see relevant warnings or start reducing them beginning with the most occuring
 
 warning_condenser file_with_warnings [-d]
@@ -47,7 +47,8 @@ example output:
 TODOs:
 - include/exclude filter for pathes
 - importer for -fdiagnostics-format=json (https://clang.llvm.org/docs/UsersManual.html#formatting-of-diagnostics, https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Message-Formatting-Options.html#Options-to-Control-Diagnostic-Messages-Formatting)
-- parse MSVC ouput
+- parse gcc/clang diagnosis for older versions (starting with Ubuntu 14.04: gcc 4.8.4, clang 3.4)
+- parse MSVC diagnosis (test with VS2017,2015,2017,2019,2022)
 
   Help wanted:
 
