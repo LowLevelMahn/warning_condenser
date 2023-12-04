@@ -1,0 +1,13 @@
+MSBuild or cl.exe got different output 
+
+VS2022
+
+cl.exe /EHsc /W4 warning_producer.cpp
+
+is different
+
+to 
+
+CMake ..
+CMake --build . -config Debug
+
