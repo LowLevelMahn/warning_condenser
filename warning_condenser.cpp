@@ -270,12 +270,14 @@ D:\test123\test.cpp(183,55): warning C4267:         ] [D:\test123\test.vcxproj]
 
     for (const auto& ti : type_infos)
     {
-        printf("(count: % 5zu) type: %s\n", ti.warning_count, ti.type.c_str());
+        printf("(count: % 5zu: unique: % 5zu) type: %s\n", ti.warning_count, ti.warnings.size(), ti.type.c_str());
 
+#if 1
         for (const auto& wc : ti.warnings)
         {
             printf("  (% 5zu) %s\n", wc.count, wc.content.c_str());
         }
+#endif
     }
 
     return 0;
